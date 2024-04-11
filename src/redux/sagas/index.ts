@@ -6,6 +6,8 @@ import { searchSkillsRequest } from "../actions/actionsCreator";
 import { searchSkills } from "../fetchs/searchSkills";
 import { searchFailure, searchRun, searchSuccess as searchSuccess } from "../reducers/searchSkilsSlice";
 
+import { TSearchItem } from "../../types/TSearchItem";
+
 function filterChangeSearchAction(action: PayloadAction<{search: string}>) {
     return action.type === CHANGE_SEARCH_FIELD && action.payload.search.trim() !== '';
 }
@@ -24,7 +26,7 @@ function* handleSearchSkillsSaga(action: PayloadAction<{search: string}>) {
     try {
         const retryCount = 3;
         const retryDelay = 1 * 1000;[]
-        const data = yield retry(retryCount, retryDelay, searchSkills, action.payload.search);
+        const data: TSearchItem = yield retry(retryCount, retryDelay, searchSkills, action.payload.search);
         yield put(searchSuccess(data));
     } catch (error: unknown) {
         if ( error instanceof Error) {
@@ -40,7 +42,6 @@ function* watchSearchSkillsSaga() {
 }
 
 export default function* saga() {
-    console.log('saga run')
     yield spawn(watchChangeSearchSaga);
     yield spawn(watchSearchSkillsSaga)
 }
